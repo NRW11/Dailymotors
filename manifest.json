@@ -1,18 +1,13 @@
 {
-  "id": "./",
   "name": "สมุดน้ำมันมอไซค์",
   "short_name": "น้ำมันมอไซค์",
-  "description": "จดค่าน้ำมัน เลขไมล์ คำนวณกิโลต่อลิตร สรุปรายเดือน และบันทึกอะไหล่/ถ่ายน้ำมันเครื่อง",
-  "start_url": "./",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#000000",
   "theme_color": "#000000",
-  "lang": "th",
   "icons": [
-    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
-    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
-    {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"}
   ]
 }

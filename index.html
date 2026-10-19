@@ -451,8 +451,10 @@ document.querySelector('nav').addEventListener('click',function(ev){
 
 /* ---------- เริ่มต้น ---------- */
 resetFuel();resetSvc();renderAll();
+/* ล้าง service worker/แคชเก่าที่เคยลงไว้ (เวอร์ชันนี้ไม่ใช้ service worker) */
 if('serviceWorker' in navigator){
-  window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});
+  navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister();});}).catch(function(){});
+  if(window.caches){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k);});}).catch(function(){});}
 }
 })();
 </script>
