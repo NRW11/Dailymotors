@@ -451,10 +451,16 @@ document.querySelector('nav').addEventListener('click',function(ev){
 
 /* ---------- เริ่มต้น ---------- */
 resetFuel();resetSvc();renderAll();
-/* ล้าง service worker/แคชเก่าที่เคยลงไว้ (เวอร์ชันนี้ไม่ใช้ service worker) */
+/* ล้าง service worker/แคชเก่าของแอปนี้เท่านั้น (ไม่แตะโปรเจกต์อื่นบน nrw11.github.io) */
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister();});}).catch(function(){});
-  if(window.caches){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k);});}).catch(function(){});}
+  navigator.serviceWorker.getRegistrations().then(function(rs){
+    rs.forEach(function(r){if(r.scope.indexOf('/Dailymotors/')>-1)r.unregister();});
+  }).catch(function(){});
+  if(window.caches){
+    caches.keys().then(function(ks){
+      ks.forEach(function(k){if(k.indexOf('moto-log-')===0)caches.delete(k);});
+    }).catch(function(){});
+  }
 }
 })();
 </script>
