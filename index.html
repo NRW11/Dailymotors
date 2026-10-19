@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>สมุดน้ำมันมอไซค์</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0b0910; --card:#16121f; --ink:#ece8f6; --mute:#9d95b3; --line:#2a2438;
+  --teal:#b9a2ff; --on:#140d26; --amber:#f0b84a; --oil:#d9a86f; --red:#ff7f78; --dark:#000000;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:'Sarabun',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.45;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+header{background:var(--dark);color:#fff;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 18px}
+header h1{margin:0;font-size:18px;font-weight:700}
+header small{color:#a99fc2}
+main{max-width:620px;margin:0 auto;padding:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+h2{font-size:16px;margin:0 0 10px}
+.odo{display:flex;gap:4px;align-items:center;margin:2px 0 6px}
+.odo .d{background:var(--dark);color:#fff;font-variant-numeric:tabular-nums;font-weight:700;font-size:34px;line-height:1;width:30px;padding:8px 0;text-align:center;border-radius:5px;border-bottom:3px solid var(--teal)}
+.odo .p{font-size:34px;font-weight:700;width:12px;text-align:center}
+.odo .u{margin-left:6px;color:var(--mute);font-size:15px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.stat{background:var(--bg);border-radius:8px;padding:8px 10px}
+.stat b{display:block;font-size:18px;font-variant-numeric:tabular-nums}
+.stat span{color:var(--mute);font-size:13px}
+form{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+form .full{grid-column:1/-1}
+label{font-size:13px;color:var(--mute);display:block;margin-bottom:3px}
+input,select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;min-height:44px}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+.chk{display:flex;gap:8px;align-items:center;min-height:44px}
+.chk input{width:22px;height:22px;min-height:0}
+button{font:inherit;border:0;border-radius:8px;padding:11px 14px;min-height:44px;cursor:pointer;background:var(--teal);color:var(--on);font-weight:700}
+button.ghost{background:transparent;color:var(--mute);border:1px solid var(--line);font-weight:500}
+button.sm{min-height:34px;padding:4px 10px;font-size:14px}
+.hint{grid-column:1/-1;color:var(--mute);font-size:13px;min-height:18px}
+.row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row .l{min-width:0}
+.row .r{text-align:right;white-space:nowrap}
+.row .t{font-weight:700}
+.row .s{color:var(--mute);font-size:13px}
+.badge{display:inline-block;background:var(--teal);color:var(--on);border-radius:99px;padding:1px 9px;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.badge.low{background:var(--amber);color:#1a1200}
+.act{display:flex;gap:6px;justify-content:flex-end;margin-top:4px}
+.tag{font-size:12px;border-radius:4px;padding:0 6px;background:var(--bg);color:var(--mute);border:1px solid var(--line)}
+.tag.oil{color:var(--oil);border-color:var(--oil)}
+.empty{color:var(--mute);text-align:center;padding:18px 0}
+.alert{border-left:5px solid var(--teal)}
+.alert.warn{border-left-color:var(--amber)}
+.alert.over{border-left-color:var(--red)}
+.m-head{display:flex;justify-content:space-between;align-items:baseline}
+.m-head b{font-size:17px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px}
+td{padding:5px 0;border-top:1px solid var(--line)}
+td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;background:transparent;color:var(--mute);border-radius:0;font-weight:500;font-size:14px;min-height:56px}
+nav button[aria-selected=true]{color:var(--teal);font-weight:700;box-shadow:inset 0 3px 0 var(--teal)}
+section{display:none}
+section.on{display:block}
+@media (prefers-reduced-motion:no-preference){.card{transition:border-color .15s}}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="bikeTitle">สมุดน้ำมันมอไซค์</h1>
+  <small>จดทุกครั้งที่เติม ดูค่าเฉลี่ยกิโลต่อลิตร</small>
+</header>
+
+<main>
+<!-- เติมน้ำมัน -->
+<section id="tab-fuel" class="on">
+  <div class="card">
+    <div class="s" style="color:var(--mute);font-size:13px">ประหยัดเฉลี่ยทั้งหมด</div>
+    <div class="odo" id="avgOdo"></div>
+    <div class="stats">
+      <div class="stat"><b id="stLast">-</b><span>ครั้งล่าสุด (กม./ลิตร)</span></div>
+      <div class="stat"><b id="stOdo">-</b><span>เลขไมล์ล่าสุด (กม.)</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 id="fuelFormTitle">เติมน้ำมันวันนี้</h2>
+    <form id="fuelForm" autocomplete="off">
+      <div><label for="fDate">วันที่</label><input id="fDate" type="date" required></div>
+      <div><label for="fOdo">เลขไมล์ (กม.)</label><input id="fOdo" type="number" inputmode="numeric" min="0" step="1" required></div>
+      <div><label for="fBaht">จ่ายเงิน (บาท)</label><input id="fBaht" type="number" inputmode="decimal" min="0" step="0.01" required></div>
+      <div><label for="fLit">ได้น้ำมัน (ลิตร)</label><input id="fLit" type="number" inputmode="decimal" min="0" step="0.001" required></div>
+      <div class="full chk"><input id="fFull" type="checkbox" checked><label for="fFull" style="margin:0;color:var(--ink)">เติมจนเต็มถัง</label></div>
+      <div class="hint" id="fuelHint"></div>
+      <button class="full" type="submit" id="fuelSave">บันทึกการเติม</button>
+      <button class="full ghost" type="button" id="fuelCancel" hidden>ยกเลิกการแก้ไข</button>
+    </form>
+  </div>
+
+  <div class="card"><h2>ประวัติการเติม</h2><div id="fuelList"></div></div>
+</section>
+
+<!-- บำรุงรักษา -->
+<section id="tab-service">
+  <div class="card alert" id="oilCard"></div>
+
+  <div class="card">
+    <h2 id="svcFormTitle">บันทึกอะไหล่ / ถ่ายน้ำมันเครื่อง</h2>
+    <form id="svcForm" autocomplete="off">
+      <div class="full"><label for="sType">ประเภท</label>
+        <select id="sType">
+          <option value="oil">ถ่ายน้ำมันเครื่อง</option>
+          <option value="part">อะไหล่</option>
+          <option value="other">อื่นๆ (ค่าแรง ล้างรถ ภาษี)</option>
+        </select></div>
+      <div><label for="sDate">วันที่</label><input id="sDate" type="date" required></div>
+      <div><label for="sOdo">เลขไมล์ (กม.)</label><input id="sOdo" type="number" inputmode="numeric" min="0" step="1"></div>
+      <div class="full"><label for="sName">รายการ</label><input id="sName" type="text" placeholder="เช่น ผ้าเบรกหน้า, โซ่สเตอร์" required></div>
+      <div><label for="sCost">ราคา (บาท)</label><input id="sCost" type="number" inputmode="decimal" min="0" step="0.01" required></div>
+      <div><label for="sShop">ร้าน (ถ้ามี)</label><input id="sShop" type="text"></div>
+      <div class="full"><label for="sNote">หมายเหตุ</label><input id="sNote" type="text" placeholder="เช่น ยี่ห้อ/เบอร์น้ำมัน"></div>
+      <button class="full" type="submit" id="svcSave">บันทึกรายการ</button>
+      <button class="full ghost" type="button" id="svcCancel" hidden>ยกเลิกการแก้ไข</button>
+    </form>
+  </div>
+
+  <div class="card"><h2>ประวัติบำรุงรักษา</h2><div id="svcList"></div></div>
+</section>
+
+<!-- สรุปเดือน -->
+<section id="tab-month">
+  <div id="monthList"></div>
+</section>
+
+<!-- ตั้งค่า -->
+<section id="tab-set">
+  <div class="card">
+    <h2>รถของฉัน</h2>
+    <form id="setForm" onsubmit="return false">
+      <div class="full"><label for="setName">ชื่อรถ</label><input id="setName" type="text" placeholder="เช่น Honda Wave 125i"></div>
+      <div class="full"><label for="setOil">เปลี่ยนน้ำมันเครื่องทุกกี่กิโล</label><input id="setOil" type="number" inputmode="numeric" min="100" step="100"></div>
+      <button class="full" type="button" id="setSave">บันทึกการตั้งค่า</button>
+    </form>
+  </div>
+  <div class="card">
+    <h2>สำรองข้อมูล</h2>
+    <p style="margin:0 0 10px;color:var(--mute);font-size:14px">ข้อมูลเก็บในเครื่องนี้เท่านั้น ควรกดสำรองเป็นระยะ</p>
+    <div style="display:grid;gap:8px">
+      <button type="button" id="expJson">สำรองข้อมูล (.json)</button>
+      <button type="button" class="ghost" id="expCsv">ส่งออกเป็น CSV (เปิดใน Excel)</button>
+      <button type="button" class="ghost" id="impBtn">นำเข้าข้อมูลจากไฟล์ .json</button>
+      <input id="impFile" type="file" accept="application/json,.json" hidden>
+    </div>
+  </div>
+  <div class="card">
+    <h2>วิธีคิดกิโลต่อลิตร</h2>
+    <p style="margin:0;color:var(--mute);font-size:14px">คิดจากการเติมเต็มถังสองครั้งติดกัน: ระยะทางที่วิ่งระหว่างสองครั้ง ÷ ลิตรทั้งหมดที่เติมหลังครั้งแรกจนถึงครั้งนี้ ถ้าไม่ได้เติมเต็มถัง ให้ติ๊กออก แล้วน้ำมันครั้งนั้นจะถูกนับรวมในรอบถัดไป</p>
+  </div>
+</section>
+</main>
+
+<nav role="tablist">
+  <button role="tab" data-tab="fuel" aria-selected="true">เติมน้ำมัน</button>
+  <button role="tab" data-tab="service" aria-selected="false">อะไหล่/น้ำมันเครื่อง</button>
+  <button role="tab" data-tab="month" aria-selected="false">สรุปเดือน</button>
+  <button role="tab" data-tab="set" aria-selected="false">ตั้งค่า</button>
+</nav>
+
+<script>
+(function(){
+'use strict';
+var KEY='moto-log-v1';
+var S=load();
+var editFuel=null, editSvc=null;
+
+function load(){
+  try{
+    var d=JSON.parse(localStorage.getItem(KEY));
+    if(d&&d.fuels&&d.services){d.settings=d.settings||{};return d;}
+  }catch(e){}
+  return {fuels:[],services:[],settings:{name:'',oilInterval:2000}};
+}
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(S));}
+  catch(e){alert('บันทึกไม่ได้ พื้นที่เก็บข้อมูลในเบราว์เซอร์เต็มหรือถูกปิดไว้');}
+}
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function today(){var d=new Date();return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);}
+function fmt(n,d){d=d||0;return Number(n).toLocaleString('th-TH',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function fdate(s){var p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2]).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'});}
+function mlabel(k){var p=k.split('-');return new Date(+p[0],+p[1]-1,1).toLocaleDateString('th-TH',{month:'long',year:'numeric'});}
+function cmpDate(a,b){return a.date<b.date?-1:a.date>b.date?1:(a.odo||0)-(b.odo||0);}
+
+/* ---------- คำนวณกิโลต่อลิตร ---------- */
+function calcFuel(){
+  var f=S.fuels.slice().sort(function(a,b){return (a.odo-b.odo)||(a.date<b.date?-1:1);});
+  var res={}, last=null, acc=0;
+  f.forEach(function(e){
+    if(last) acc+=e.liters;
+    if(e.full){
+      if(last && e.odo>last.odo && acc>0){
+        var d=e.odo-last.odo;
+        res[e.id]={d:d,l:acc,k:d/acc};
+      }
+      last=e; acc=0;
+    }
+  });
+  return res;
+}
+function overall(res){
+  var d=0,l=0;
+  Object.keys(res).forEach(function(k){d+=res[k].d;l+=res[k].l;});
+  return l>0?d/l:null;
+}
+function maxOdo(){
+  var m=0;
+  S.fuels.forEach(function(x){if(x.odo>m)m=x.odo;});
+  S.services.forEach(function(x){if(x.odo>m)m=x.odo;});
+  return m;
+}
+
+/* ---------- วาดหน้า ---------- */
+function renderOdo(v){
+  var box=$('avgOdo');
+  if(v==null){box.innerHTML='<span class="d">-</span><span class="u">กม./ลิตร</span>';return;}
+  var s=v.toFixed(1), h='';
+  for(var i=0;i<s.length;i++){h+=s[i]==='.'?'<span class="p">.</span>':'<span class="d">'+s[i]+'</span>';}
+  box.innerHTML=h+'<span class="u">กม./ลิตร</span>';
+}
+
+function renderFuel(){
+  var res=calcFuel();
+  var avg=overall(res);
+  renderOdo(avg);
+  var f=S.fuels.slice().sort(function(a,b){return (b.odo-a.odo)||(a.date<b.date?1:-1);});
+  var lastK=null;
+  for(var i=0;i<f.length;i++){if(res[f[i].id]){lastK=res[f[i].id].k;break;}}
+  $('stLast').textContent=lastK==null?'-':fmt(lastK,1);
+  var mo=maxOdo();
+  $('stOdo').textContent=mo?fmt(mo):'-';
+
+  if(!f.length){$('fuelList').innerHTML='<div class="empty">ยังไม่มีรายการ เติมน้ำมันแล้วจดไว้ด้านบนได้เลย<br>ต้องเติมเต็มถังอย่างน้อย 2 ครั้งถึงจะคำนวณได้</div>';return;}
+  $('fuelList').innerHTML=f.map(function(e){
+    var r=res[e.id];
+    var badge=r?'<span class="badge'+(avg&&r.k<avg*0.85?' low':'')+'">'+fmt(r.k,1)+' กม./ล.</span>':(e.full?'':'<span class="tag">ไม่เต็มถัง</span>');
+    return '<div class="row"><div class="l"><div class="t">'+fdate(e.date)+' · '+fmt(e.odo)+' กม.</div>'+
+      '<div class="s">'+fmt(e.liters,2)+' ลิตร · '+fmt(e.baht/e.liters,2)+' บาท/ลิตร'+(r?' · วิ่ง '+fmt(r.d)+' กม.':'')+'</div></div>'+
+      '<div class="r"><div class="t">'+fmt(e.baht,0)+' ฿</div>'+badge+
+      '<div class="act"><button class="ghost sm" data-ef="'+esc(e.id)+'">แก้</button><button class="ghost sm" data-df="'+esc(e.id)+'">ลบ</button></div></div></div>';
+  }).join('');
+}
+
+var TYPE={oil:'ถ่ายน้ำมันเครื่อง',part:'อะไหล่',other:'อื่นๆ'};
+function renderService(){
+  var interval=+S.settings.oilInterval||2000;
+  var oils=S.services.filter(function(x){return x.type==='oil'&&x.odo;}).sort(function(a,b){return b.odo-a.odo;});
+  var card=$('oilCard'); card.className='card alert';
+  if(!oils.length){
+    card.innerHTML='<b>น้ำมันเครื่อง</b><div class="s" style="color:var(--mute)">ยังไม่มีบันทึกการถ่าย บันทึกพร้อมเลขไมล์เพื่อให้แจ้งรอบถัดไป</div>';
+  }else{
+    var next=oils[0].odo+interval, cur=maxOdo(), left=next-cur;
+    if(left<=0)card.className='card alert over'; else if(left<=200)card.className='card alert warn';
+    card.innerHTML='<b>รอบถ่ายน้ำมันเครื่องถัดไป: '+fmt(next)+' กม.</b>'+
+      '<div class="s" style="color:var(--mute)">ถ่ายล่าสุดที่ '+fmt(oils[0].odo)+' กม. · '+
+      (left>0?'เหลืออีก '+fmt(left)+' กม.':'เลยกำหนดมาแล้ว '+fmt(-left)+' กม.')+'</div>';
+  }
+  var l=S.services.slice().sort(function(a,b){return -cmpDate(a,b);});
+  if(!l.length){$('svcList').innerHTML='<div class="empty">ยังไม่มีรายการ</div>';return;}
+  $('svcList').innerHTML=l.map(function(e){
+    return '<div class="row"><div class="l"><div class="t">'+esc(e.name)+' <span class="tag'+(e.type==='oil'?' oil':'')+'">'+TYPE[e.type]+'</span></div>'+
+      '<div class="s">'+fdate(e.date)+(e.odo?' · '+fmt(e.odo)+' กม.':'')+(e.shop?' · '+esc(e.shop):'')+(e.note?'<br>'+esc(e.note):'')+'</div></div>'+
+      '<div class="r"><div class="t">'+fmt(e.cost,0)+' ฿</div>'+
+      '<div class="act"><button class="ghost sm" data-es="'+esc(e.id)+'">แก้</button><button class="ghost sm" data-ds="'+esc(e.id)+'">ลบ</button></div></div></div>';
+  }).join('');
+}
+
+function renderMonth(){
+  var res=calcFuel();
+  var months={};
+  function M(k){return months[k]||(months[k]={fuel:0,lit:0,fills:0,svc:0,oil:0,part:0,other:0,d:0,l:0,odos:[]});}
+  S.fuels.forEach(function(e){var m=M(e.date.slice(0,7));m.fuel+=e.baht;m.lit+=e.liters;m.fills++;m.odos.push({date:e.date,odo:e.odo});
+    if(res[e.id]){m.d+=res[e.id].d;m.l+=res[e.id].l;}});
+  S.services.forEach(function(e){var m=M(e.date.slice(0,7));m.svc+=e.cost;m[e.type]+=e.cost;if(e.odo)m.odos.push({date:e.date,odo:e.odo});});
+  var all=[];
+  S.fuels.forEach(function(e){all.push({date:e.date,odo:e.odo});});
+  S.services.forEach(function(e){if(e.odo)all.push({date:e.date,odo:e.odo});});
+  var keys=Object.keys(months).sort().reverse();
+  if(!keys.length){$('monthList').innerHTML='<div class="card"><div class="empty">ยังไม่มีข้อมูลสรุป</div></div>';return;}
+  $('monthList').innerHTML=keys.map(function(k){
+    var m=months[k], start=k+'-01', prior=0;
+    all.forEach(function(x){if(x.date<start&&x.odo>prior)prior=x.odo;});
+    var os=m.odos.map(function(x){return x.odo;});
+    var hi=os.length?Math.max.apply(null,os):0, lo=os.length?Math.min.apply(null,os):0;
+    var km=os.length?hi-(prior||lo):0;
+    var total=m.fuel+m.svc;
+    var eff=m.l>0?m.d/m.l:null;
+    return '<div class="card"><div class="m-head"><b>'+mlabel(k)+'</b><b>'+fmt(total,0)+' ฿</b></div><table>'+
+      '<tr><td>ค่าน้ำมัน ('+m.fills+' ครั้ง, '+fmt(m.lit,2)+' ลิตร)</td><td>'+fmt(m.fuel,0)+' ฿</td></tr>'+
+      '<tr><td>ถ่ายน้ำมันเครื่อง</td><td>'+fmt(m.oil,0)+' ฿</td></tr>'+
+      '<tr><td>อะไหล่</td><td>'+fmt(m.part,0)+' ฿</td></tr>'+
+      '<tr><td>อื่นๆ</td><td>'+fmt(m.other,0)+' ฿</td></tr>'+
+      '<tr><td>ระยะทางเดือนนี้</td><td>'+(km>0?fmt(km)+' กม.':'-')+'</td></tr>'+
+      '<tr><td>ประหยัดเฉลี่ย</td><td>'+(eff?fmt(eff,1)+' กม./ลิตร':'-')+'</td></tr>'+
+      '<tr><td>ต้นทุนต่อกิโล (รวมทุกอย่าง)</td><td>'+(km>0?fmt(total/km,2)+' ฿/กม.':'-')+'</td></tr>'+
+      '</table></div>';
+  }).join('');
+}
+
+function renderAll(){
+  $('bikeTitle').textContent=S.settings.name||'สมุดน้ำมันมอไซค์';
+  renderFuel();renderService();renderMonth();
+}
+
+/* ---------- ฟอร์มเติมน้ำมัน ---------- */
+function resetFuel(){
+  editFuel=null;
+  $('fuelForm').reset();
+  $('fDate').value=today();$('fFull').checked=true;
+  $('fuelFormTitle').textContent='เติมน้ำมันวันนี้';
+  $('fuelSave').textContent='บันทึกการเติม';
+  $('fuelCancel').hidden=true;$('fuelHint').textContent='';
+}
+function fuelHint(){
+  var b=+$('fBaht').value,l=+$('fLit').value,o=+$('fOdo').value;
+  var t=[];
+  if(b>0&&l>0)t.push('ลิตรละ '+fmt(b/l,2)+' บาท');
+  var prev=0;S.fuels.forEach(function(x){if(x.id!==editFuel&&x.odo>prev)prev=x.odo;});
+  if(o>0&&prev>0){
+    if(o<=prev)t.push('⚠ เลขไมล์ต่ำกว่าหรือเท่ากับครั้งก่อน ('+fmt(prev)+')');
+    else t.push('วิ่งมา '+fmt(o-prev)+' กม. จากครั้งก่อน');
+  }
+  $('fuelHint').textContent=t.join(' · ');
+}
+['fBaht','fLit','fOdo'].forEach(function(id){$(id).addEventListener('input',fuelHint);});
+
+$('fuelForm').addEventListener('submit',function(ev){
+  ev.preventDefault();
+  var rec={id:editFuel||uid(),date:$('fDate').value,odo:Math.round(+$('fOdo').value),baht:+$('fBaht').value,liters:+$('fLit').value,full:$('fFull').checked};
+  if(!rec.date||!(rec.odo>=0)||!(rec.baht>0)||!(rec.liters>0)){alert('กรอกวันที่ เลขไมล์ ราคา และลิตรให้ครบ');return;}
+  if(editFuel){S.fuels=S.fuels.map(function(x){return x.id===editFuel?rec:x;});}else{S.fuels.push(rec);}
+  save();resetFuel();renderAll();
+});
+$('fuelCancel').addEventListener('click',resetFuel);
+
+$('fuelList').addEventListener('click',function(ev){
+  var t=ev.target;
+  var de=t.getAttribute('data-df'), ee=t.getAttribute('data-ef');
+  if(de){if(confirm('ลบรายการเติมน้ำมันนี้?')){S.fuels=S.fuels.filter(function(x){return x.id!==de;});save();renderAll();}}
+  if(ee){
+    var e=S.fuels.filter(function(x){return x.id===ee;})[0];if(!e)return;
+    editFuel=e.id;$('fDate').value=e.date;$('fOdo').value=e.odo;$('fBaht').value=e.baht;$('fLit').value=e.liters;$('fFull').checked=!!e.full;
+    $('fuelFormTitle').textContent='แก้ไขรายการเติม';$('fuelSave').textContent='บันทึกการแก้ไข';$('fuelCancel').hidden=false;
+    fuelHint();window.scrollTo({top:0,behavior:'smooth'});
+  }
+});
+
+/* ---------- ฟอร์มบำรุงรักษา ---------- */
+function resetSvc(){
+  editSvc=null;$('svcForm').reset();$('sDate').value=today();
+  $('svcFormTitle').textContent='บันทึกอะไหล่ / ถ่ายน้ำมันเครื่อง';
+  $('svcSave').textContent='บันทึกรายการ';$('svcCancel').hidden=true;
+  $('sName').value='น้ำมันเครื่อง';
+}
+$('sType').addEventListener('change',function(){
+  if(editSvc)return;
+  var n=$('sName');
+  if(this.value==='oil'&&!n.value)n.value='น้ำมันเครื่อง';
+  if(this.value!=='oil'&&n.value==='น้ำมันเครื่อง')n.value='';
+});
+$('svcForm').addEventListener('submit',function(ev){
+  ev.preventDefault();
+  var odo=$('sOdo').value===''?null:Math.round(+$('sOdo').value);
+  var rec={id:editSvc||uid(),type:$('sType').value,date:$('sDate').value,odo:odo,name:$('sName').value.trim(),cost:+$('sCost').value,shop:$('sShop').value.trim(),note:$('sNote').value.trim()};
+  if(!rec.date||!rec.name||!(rec.cost>=0)){alert('กรอกวันที่ รายการ และราคาให้ครบ');return;}
+  if(editSvc){S.services=S.services.map(function(x){return x.id===editSvc?rec:x;});}else{S.services.push(rec);}
+  save();resetSvc();renderAll();
+});
+$('svcCancel').addEventListener('click',resetSvc);
+$('svcList').addEventListener('click',function(ev){
+  var t=ev.target, ds=t.getAttribute('data-ds'), es=t.getAttribute('data-es');
+  if(ds){if(confirm('ลบรายการนี้?')){S.services=S.services.filter(function(x){return x.id!==ds;});save();renderAll();}}
+  if(es){
+    var e=S.services.filter(function(x){return x.id===es;})[0];if(!e)return;
+    editSvc=e.id;$('sType').value=e.type;$('sDate').value=e.date;$('sOdo').value=e.odo==null?'':e.odo;
+    $('sName').value=e.name;$('sCost').value=e.cost;$('sShop').value=e.shop||'';$('sNote').value=e.note||'';
+    $('svcFormTitle').textContent='แก้ไขรายการ';$('svcSave').textContent='บันทึกการแก้ไข';$('svcCancel').hidden=false;
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+});
+
+/* ---------- ตั้งค่า / สำรองข้อมูล ---------- */
+$('setName').value=S.settings.name||'';
+$('setOil').value=S.settings.oilInterval||2000;
+$('setSave').addEventListener('click',function(){
+  S.settings.name=$('setName').value.trim();
+  S.settings.oilInterval=Math.max(100,+$('setOil').value||2000);
+  save();renderAll();alert('บันทึกการตั้งค่าแล้ว');
+});
+function download(name,text,type){
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([text],{type:type}));a.download=name;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(function(){URL.revokeObjectURL(a.href);},1000);
+}
+$('expJson').addEventListener('click',function(){download('moto-log-'+today()+'.json',JSON.stringify(S,null,1),'application/json');});
+$('expCsv').addEventListener('click',function(){
+  function q(v){v=String(v==null?'':v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+  var res=calcFuel();
+  var rows=[['ชนิด','วันที่','เลขไมล์','ลิตร','บาท','บาทต่อลิตร','กม.ต่อลิตร','ประเภท/รายการ','ร้าน','หมายเหตุ']];
+  S.fuels.slice().sort(cmpDate).forEach(function(e){rows.push(['เติมน้ำมัน',e.date,e.odo,e.liters,e.baht,(e.baht/e.liters).toFixed(2),res[e.id]?res[e.id].k.toFixed(2):'',e.full?'เต็มถัง':'ไม่เต็มถัง','','']);});
+  S.services.slice().sort(cmpDate).forEach(function(e){rows.push([TYPE[e.type],e.date,e.odo==null?'':e.odo,'',e.cost,'','',e.name,e.shop||'',e.note||'']);});
+  download('moto-log-'+today()+'.csv','\ufeff'+rows.map(function(r){return r.map(q).join(',');}).join('\n'),'text/csv');
+});
+$('impBtn').addEventListener('click',function(){$('impFile').click();});
+$('impFile').addEventListener('change',function(){
+  var f=this.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{
+      var d=JSON.parse(r.result);
+      if(!d||!Array.isArray(d.fuels)||!Array.isArray(d.services))throw 0;
+      if(!confirm('นำเข้าจะแทนที่ข้อมูลปัจจุบันทั้งหมด ดำเนินการต่อ?'))return;
+      d.settings=d.settings||{};S=d;save();
+      $('setName').value=S.settings.name||'';$('setOil').value=S.settings.oilInterval||2000;
+      renderAll();alert('นำเข้าข้อมูลแล้ว');
+    }catch(e){alert('ไฟล์ไม่ถูกต้อง');}
+  };
+  r.readAsText(f);this.value='';
+});
+
+/* ---------- แท็บ ---------- */
+document.querySelector('nav').addEventListener('click',function(ev){
+  var b=ev.target.closest('button[data-tab]');if(!b)return;
+  document.querySelectorAll('nav button').forEach(function(x){x.setAttribute('aria-selected',x===b?'true':'false');});
+  document.querySelectorAll('section').forEach(function(s){s.classList.toggle('on',s.id==='tab-'+b.dataset.tab);});
+  window.scrollTo(0,0);
+});
+
+/* ---------- เริ่มต้น ---------- */
+resetFuel();resetSvc();renderAll();
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});
+}
+})();
+</script>
+</body>
+</html>
